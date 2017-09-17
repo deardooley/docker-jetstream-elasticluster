@@ -1,0 +1,78 @@
+# Elasticluster Jetstream Slurm Template
+
+[cloud/jetstream-cloud]
+provider=openstack
+auth_url=https://tacc.jetstream-cloud.org:5000/v3
+identity_api_version=3
+region_name=RegionOne
+project_name=TG-*****
+user_domain_name=tacc
+project_domain_name=tacc
+username=******
+password=********
+request_floating_ip=True
+
+
+[login/jetstream-login]
+image_user=root
+image_user_sudo=root
+image_sudo=False
+# keypair used to run stuff on the nodes.
+user_key_name=alamo-root
+user_key_private=~/.ssh/id_rsa
+user_key_public=~/.ssh/id_rsa.pub
+
+# Slurm: 
+
+[setup/ansible-slurm-glusterfs]
+provider=ansible
+frontend_groups=slurm_master
+compute_groups=slurm_worker
+
+
+[cluster/jetstream-slurm]
+global_var_ansible_ssh_host_key_dsa_public=''
+cloud=jetstream-cloud
+login=jetstream-login
+setup=ansible-slurm-glusterfs
+# one frontend node is normal for Slurm/gridengine
+frontend_nodes=1
+# change this as needed
+compute_nodes=1
+ssh_to=frontend
+security_group=default
+image_id=87e08a17-eae2-4ce4-9051-c561d9a54bde
+network_ids=10a92c55-bbc5-4713-94c0-175bf66ea489
+# 6cpu/16GB/60GB
+flavor=m1.medium
+security_group=default
+# seconds allowed for all nodes to spin up:
+wait_timeout=600
+netid=10a92c55-bbc5-4713-94c0-175bf66ea489
+
+# Jupyter hub
+
+[setup/ansible-jupyterhub]
+provider=ansible
+frontend_groups=jupyterhub,jupyterhub
+compute_groups=
+
+[cluster/jupyterhub]
+global_var_ansible_ssh_host_key_dsa_public=''
+cloud=jetstream-cloud
+login=jetstream-login
+setup=ansible-jupyterhub
+# one frontend node is normal for Slurm/gridengine
+frontend_nodes=1
+# change this as needed
+compute_nodes=0
+ssh_to=frontend
+security_group=default
+image_id=87e08a17-eae2-4ce4-9051-c561d9a54bde
+network_ids=10a92c55-bbc5-4713-94c0-175bf66ea489
+# 6cpu/16GB/60GB
+flavor=m1.medium
+security_group=default
+# seconds allowed for all nodes to spin up:
+wait_timeout=600
+netid=10a92c55-bbc5-4713-94c0-175bf66ea489

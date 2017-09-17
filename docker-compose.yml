@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+  elasticluster:
+    image: agaveplatform/elasticluster:jetsstream
+    tty: true
+    environment:
+      - OS_AUTH_URL
+      - OS_PROJECT_ID
+      - OS_TENANT_NAME
+      - OS_PROJECT_NAME
+      - OS_USER_DOMAIN_NAME
+      - OS_USERNAME
+      - OS_PASSWORD
+      - OS_REGION_NAME
+    volumes:
+      - $HOME/.elasticluster:/root/.elasticluster
+      - $HOME/.ssh:/root/.ssh:ro
+      - $HOME/.openstack/$USER-openrc.sh:/root/.openstack/openrc.sh

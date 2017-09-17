@@ -1,0 +1,6 @@
+---
+- name: Singularity Playbook
+  hosts: singularity
+  roles:
+#    - neurodebian
+    - singularity

@@ -1,0 +1,3 @@
+---
+- name: restart docker engine
+  action: service name=docker state=restarted

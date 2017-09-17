@@ -1,0 +1,5 @@
+---
+- name: Docker CE Playbook
+  hosts: docker
+  roles:
+    - docker-ce

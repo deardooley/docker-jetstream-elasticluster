@@ -1,0 +1,8 @@
+---
+- name: Docker CE Playbook
+  hosts: docker
+  tasks: 
+    - include: common/tasks/ssh_host_based_authentication.yml hosts=${groups.all}
+    - include: docker/tasks/main.yml
+  handlers:
+    - include: docker/handlers/main.yml
