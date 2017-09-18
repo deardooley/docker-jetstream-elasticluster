@@ -170,4 +170,3 @@ NodeName={{host}} RealMemory={{hostvars[host]['ansible_memtotal_mb']|int - 384}}
 ## Cluster partitions
 #
 PartitionName=main Nodes={% for host in groups.slurm_worker %}{{host}},{%endfor%} MaxTime=INFINITE State=UP Default=YES
-PartitionName=debug Nodes={% for host in groups.slurm_worker %}{{host}},{%endfor%} MaxTime=INFINITE State=UP Default=YES

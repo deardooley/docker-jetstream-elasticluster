@@ -15,7 +15,7 @@
     - local
   hosts: all
   # by default these are no-op (empty task list)
-  roles:
-    - docker-ce
-    - singularity
+  roles: []
+#    - docker-ce
+#    - singularity
   tasks: []

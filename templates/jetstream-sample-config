@@ -1,10 +1,21 @@
 # Elasticluster Jetstream Slurm Template
 
+###########################################################################################
+# Jetstream Auth Configuration
+#
+# This is where you configure your Jetstream authentication
+# credentials. Use the values provided in your <allocation_id>-openrc.sh
+# file downloaded from the Jetstream Horizon UI at:
+# https://tacc.jetstream-cloud.org/dashboard/project/access_and_security/api_access/openrc/
+#
+###########################################################################################
+
 [cloud/jetstream-cloud]
 provider=openstack
 auth_url=https://tacc.jetstream-cloud.org:5000/v3
 identity_api_version=3
 region_name=RegionOne
+# Update with the ID of your allocation  ID from
 project_name=TG-*****
 user_domain_name=tacc
 project_domain_name=tacc
@@ -12,6 +23,16 @@ username=******
 password=********
 request_floating_ip=True
 
+###########################################################################################
+# VM Key Pair Configuration
+#
+# This is where you define what key pairs you would like to use to
+# login to the resulting VM. Your key pair should already be present
+# in Jetstream before running this script. You can view and manage your
+# key pairs at:
+# https://tacc.jetstream-cloud.org/dashboard/project/access_and_security/?tab=access_security_tabs__keypairs_tab
+#
+###########################################################################################
 
 [login/jetstream-login]
 image_user=root
@@ -22,7 +43,17 @@ user_key_name=alamo-root
 user_key_private=~/.ssh/id_rsa
 user_key_public=~/.ssh/id_rsa.pub
 
-# Slurm: 
+
+###########################################################################################
+# Slurm Cluster
+#
+# This will build a Slurm HPC cluster with mpi support. The cluster is
+# made up of a single head node, and two backend nodes. A shared file system
+# is NFS mounted across both frontend and backend nodes at /home. A single
+# non-privileged user account, ubuntu, is defined and granted access to
+# the two Slurm partitions: main, debug.
+#
+###########################################################################################
 
 [setup/ansible-slurm-glusterfs]
 provider=ansible
@@ -50,7 +81,14 @@ security_group=default
 wait_timeout=600
 netid=10a92c55-bbc5-4713-94c0-175bf66ea489
 
-# Jupyter hub
+###########################################################################################
+# Student VM
+#
+# This will build a swarm cluster running one Jupyter and one sandbox container per host.
+# The containers will mount a common persistent volume and be pre-authenticated with
+# valid Agave authentication credentials.
+#
+###########################################################################################
 
 [setup/ansible-jupyterhub]
 provider=ansible
@@ -62,6 +100,43 @@ global_var_ansible_ssh_host_key_dsa_public=''
 cloud=jetstream-cloud
 login=jetstream-login
 setup=ansible-jupyterhub
+# one frontend node is normal for Slurm/gridengine
+frontend_nodes=1
+# change this as needed
+compute_nodes=0
+ssh_to=frontend
+security_group=default
+image_id=87e08a17-eae2-4ce4-9051-c561d9a54bde
+network_ids=10a92c55-bbc5-4713-94c0-175bf66ea489
+# 6cpu/16GB/60GB
+flavor=m1.medium
+security_group=default
+# seconds allowed for all nodes to spin up:
+wait_timeout=600
+netid=10a92c55-bbc5-4713-94c0-175bf66ea489
+
+
+###########################################################################################
+# Docker & Singularity base images
+#
+# This can be used to create an updated Ubuntu 16.04 image
+# with dependencies updated and basic configurations in
+# place. Use the resulting snapshot image id in the
+# cluster definitions above to speed up the deployment
+# process dramatically.
+#
+###########################################################################################
+
+[setup/container-base-image]
+provider=ansible
+frontend_groups=docker,singularity
+compute_groups=docker,singularity
+
+[cluster/base-image]
+global_var_ansible_ssh_host_key_dsa_public=''
+cloud=jetstream-cloud
+login=jetstream-login
+setup=container-base-image
 # one frontend node is normal for Slurm/gridengine
 frontend_nodes=1
 # change this as needed
